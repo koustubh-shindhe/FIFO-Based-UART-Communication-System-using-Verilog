@@ -4,11 +4,11 @@
 
 This project is a simple implementation of a FIFO-Based UART Communication System using Verilog HDL.
 
-The idea behind this project is to solve the problem of data loss in UART communication. Since UART can transmit only one bit at a time, new incoming data may get lost if the transmitter is busy. To avoid this problem, a FIFO buffer is used before the UART transmitter.
+The main idea behind this project is to avoid data loss during UART communication. Since UART can transmit only one bit at a time, incoming data may get lost if the transmitter is busy. To solve this problem, a FIFO buffer is placed before the UART transmitter.
 
-The FIFO stores the incoming data temporarily and sends it to the UART whenever the transmitter becomes free. This helps in transmitting all the data in the correct order without losing any information.
+The FIFO temporarily stores the incoming data and sends it to the UART whenever the transmitter becomes free. This ensures that all the data is transmitted in the correct order without any loss.
 
-The project was designed and simulated using Xilinx Vivado.
+The project was designed and simulated using Xilinx Vivado and XSIM Simulator.
 
 ---
 
@@ -16,17 +16,19 @@ The project was designed and simulated using Xilinx Vivado.
 
 UART (Universal Asynchronous Receiver Transmitter) is a serial communication protocol used to transfer data between two devices.
 
-It uses only two communication lines:
+It uses two communication lines:
 
 - TX (Transmit)
 - RX (Receive)
 
 UART is commonly used in:
+
 - FPGA to PC communication
 - Microcontrollers
 - Bluetooth modules
 - GPS modules
 - Serial debugging
+- Embedded systems
 
 ---
 
@@ -69,13 +71,15 @@ By using FIFO:
 55 -> AA -> F0
 ```
 
-all the data is stored and transmitted one by one.
+all the incoming data is stored and transmitted one by one without losing any information.
 
 ### Advantages
+
 - Prevents data loss
 - Buffers incoming data
 - Handles burst data efficiently
 - Improves communication reliability
+- Decouples the data producer and UART transmitter
 
 ---
 
@@ -98,7 +102,7 @@ all the data is stored and transmitted one by one.
 ## Project Structure
 
 ```text
-UART-FIFO-Communication-System/
+FIFO-Based-UART-Communication-System-using-Verilog/
 │
 ├── rtl/
 │   ├── uart_tx.v
@@ -113,7 +117,7 @@ UART-FIFO-Communication-System/
 │   ├── uart_fifo_architecture.png
 │   └── uart_fifo_schematic.png
 │
-├── waveforms/
+├── waveform/
 │   ├── functional_waveform.png
 │   └── corner_case_waveform.png
 │
@@ -122,16 +126,37 @@ UART-FIFO-Communication-System/
 
 ---
 
-## Modules Used
+## RTL Modules
 
 ### uart_tx.v
-Implements the UART transmitter.
+UART transmitter module that converts parallel data into serial data.
+
+Features:
+- Start bit generation
+- 8-bit data transmission
+- Stop bit generation
+- Baud-rate control
+
+---
 
 ### fifo.v
-Implements an 8-bit, 16-depth FIFO memory.
+8-bit, 16-depth synchronous FIFO.
+
+Features:
+- Write operation
+- Read operation
+- Full flag generation
+- Empty flag generation
+
+---
 
 ### uart_fifo_top.v
-Connects the FIFO and UART modules.
+Top module integrating FIFO and UART.
+
+Functions:
+- Stores incoming data in FIFO.
+- Reads data when UART becomes free.
+- Sends data serially through UART.
 
 ---
 
@@ -139,13 +164,13 @@ Connects the FIFO and UART modules.
 
 | Signal | Description |
 |---------|-------------|
-| clk | System clock |
-| rst | Reset signal |
-| wr_en | Write enable |
-| data_in[7:0] | 8-bit input data |
-| tx | UART serial output |
-| full | FIFO full flag |
-| empty | FIFO empty flag |
+| clk | System Clock |
+| rst | Reset Signal |
+| wr_en | FIFO Write Enable |
+| data_in[7:0] | 8-bit Input Data |
+| tx | UART Serial Output |
+| full | FIFO Full Flag |
+| empty | FIFO Empty Flag |
 
 ---
 
@@ -171,31 +196,49 @@ UART transmits:
 55 -> AA -> F0
 ```
 
-in the same order.
+in the same order without losing any data.
 
 ---
 
-## Verification
+## Functional Verification
 
-### Functional Test Cases
+### Test Cases
+
 - Reset Test
 - Single Data Transmission
 - Multiple Data Transmission
 - FIFO Empty Condition
+- UART Serial Transmission
 
 <p align="center">
-  <img src="waveforms/functional_waveform.png" width="900">
+  <img src="waveform/functional_waveform.png" width="900">
 </p>
 
-### Corner Test Cases
+---
+
+## Corner Case Verification
+
+### Test Cases
+
 - Reset During Transmission
 - Multiple Consecutive Writes
 - Write While UART is Busy
 - FIFO Overflow Attempt
 
 <p align="center">
-  <img src="waveforms/corner_case_waveform.png" width="900">
+  <img src="waveform/corner_case_waveform.png" width="900">
 </p>
+
+---
+
+## Applications
+
+- FPGA Communication Systems
+- Embedded Systems
+- Sensor Interfaces
+- Serial Debugging
+- Data Logging Systems
+- Microcontroller Communication
 
 ---
 
@@ -207,28 +250,15 @@ in the same order.
 
 ---
 
-## Applications
+## Skills Demonstrated
 
-- FPGA communication
-- Embedded systems
-- Serial interfaces
-- Data logging systems
-- Sensor interfaces
-
----
-
-## Skills Gained
-
-- Verilog Coding
 - RTL Design
-- UART Protocol
+- Verilog Coding
 - FIFO Design
-- Simulation and Verification
-- FPGA Development
+- UART Protocol
+- Functional Verification
+- Corner Case Verification
+
 
 ---
 
-## Author
-
-**Koustubh Shindhe**  
-B.E. – VLSI Design and Technology
