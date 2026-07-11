@@ -1,24 +1,27 @@
 # FIFO-Based UART Communication System using Verilog HDL
 
-## About the Project
+## About This Project
 
-This project implements a FIFO-Based UART Communication System in Verilog HDL. The main objective of this project is to achieve reliable serial communication by using a FIFO buffer along with a UART transmitter.
+This project is a simple implementation of a FIFO-Based UART Communication System using Verilog HDL.
 
-UART is widely used in embedded systems and FPGA designs for serial communication. Since UART can transmit only one bit at a time, incoming data may be lost if new data arrives while the transmitter is busy. To overcome this problem, a FIFO buffer is added before the UART transmitter.
+The idea behind this project is to solve the problem of data loss in UART communication. Since UART can transmit only one bit at a time, new incoming data may get lost if the transmitter is busy. To avoid this problem, a FIFO buffer is used before the UART transmitter.
 
-The FIFO temporarily stores the incoming data and sends it to the UART whenever the transmitter becomes free. This ensures that the data is transmitted in the correct order without any loss.
+The FIFO stores the incoming data temporarily and sends it to the UART whenever the transmitter becomes free. This helps in transmitting all the data in the correct order without losing any information.
+
+The project was designed and simulated using Xilinx Vivado.
 
 ---
 
 ## What is UART?
 
-UART (Universal Asynchronous Receiver Transmitter) is a serial communication protocol that transfers data between two devices using only two communication lines:
+UART (Universal Asynchronous Receiver Transmitter) is a serial communication protocol used to transfer data between two devices.
+
+It uses only two communication lines:
 
 - TX (Transmit)
 - RX (Receive)
 
-UART sends data one bit at a time and is commonly used in:
-
+UART is commonly used in:
 - FPGA to PC communication
 - Microcontrollers
 - Bluetooth modules
@@ -29,32 +32,32 @@ UART sends data one bit at a time and is commonly used in:
 
 ## What is FIFO?
 
-FIFO stands for First-In First-Out.
+FIFO stands for **First-In First-Out**.
 
 The first data written into the memory is the first data that comes out.
 
 Example:
 
-```
+```text
 Data Written : 55 -> AA -> F0
 Data Read    : 55 -> AA -> F0
 ```
 
-FIFO acts as a temporary storage buffer between two modules operating at different speeds.
+FIFO acts like a queue and temporarily stores data until it is transmitted.
 
 ---
 
-## Why is FIFO used with UART?
+## Why use FIFO with UART?
 
 Suppose UART is transmitting:
 
-```
+```text
 55
 ```
 
 Before the transmission is completed, another data arrives:
 
-```
+```text
 AA
 ```
 
@@ -62,37 +65,73 @@ Without FIFO, the new data may be lost because UART is still busy.
 
 By using FIFO:
 
-```
+```text
 55 -> AA -> F0
 ```
 
-all the incoming data is stored and transmitted one by one without losing any information.
+all the data is stored and transmitted one by one.
+
+### Advantages
+- Prevents data loss
+- Buffers incoming data
+- Handles burst data efficiently
+- Improves communication reliability
 
 ---
 
 ## Project Architecture
 
 <p align="center">
-  <img src="images/architecture.png" width="900">
+  <img src="images/uart_fifo_architecture.png" width="900">
 </p>
 
 ---
 
-## Project Modules
+## Synthesized Schematic
 
-### fifo.v
-- 8-bit, 16-depth synchronous FIFO
-- Stores incoming data temporarily
-- Generates Full and Empty flags
+<p align="center">
+  <img src="images/uart_fifo_schematic.png" width="900">
+</p>
+
+---
+
+## Project Structure
+
+```text
+UART-FIFO-Communication-System/
+│
+├── rtl/
+│   ├── uart_tx.v
+│   ├── fifo.v
+│   └── uart_fifo_top.v
+│
+├── tb/
+│   ├── uart_fifo_tb.v
+│   └── uart_fifo_corner_tb.v
+│
+├── images/
+│   ├── uart_fifo_architecture.png
+│   └── uart_fifo_schematic.png
+│
+├── waveforms/
+│   ├── functional_waveform.png
+│   └── corner_case_waveform.png
+│
+└── README.md
+```
+
+---
+
+## Modules Used
 
 ### uart_tx.v
-- UART transmitter module
-- Adds Start bit and Stop bit
-- Converts parallel data into serial data
+Implements the UART transmitter.
+
+### fifo.v
+Implements an 8-bit, 16-depth FIFO memory.
 
 ### uart_fifo_top.v
-- Top module integrating FIFO and UART
-- Controls data transfer between FIFO and UART
+Connects the FIFO and UART modules.
 
 ---
 
@@ -102,7 +141,7 @@ all the incoming data is stored and transmitted one by one without losing any in
 |---------|-------------|
 | clk | System clock |
 | rst | Reset signal |
-| wr_en | FIFO write enable |
+| wr_en | Write enable |
 | data_in[7:0] | 8-bit input data |
 | tx | UART serial output |
 | full | FIFO full flag |
@@ -110,48 +149,53 @@ all the incoming data is stored and transmitted one by one without losing any in
 
 ---
 
-## Verification
+## Example Working
 
-The design was verified in Xilinx Vivado using functional and corner-case testbenches.
+Input data:
 
-### Functional Test Cases
-- Reset operation
-- Single data transmission
-- Multiple data transmission
-- FIFO empty condition
-- UART transmission
+```text
+55
+AA
+F0
+```
 
-### Corner Test Cases
-- Reset during transmission
-- Consecutive writes
-- Write while UART is busy
-- FIFO overflow attempt
+FIFO stores:
+
+```text
+55 -> AA -> F0
+```
+
+UART transmits:
+
+```text
+55 -> AA -> F0
+```
+
+in the same order.
 
 ---
 
-## Simulation Results
+## Verification
 
-### Functional Waveform
+### Functional Test Cases
+- Reset Test
+- Single Data Transmission
+- Multiple Data Transmission
+- FIFO Empty Condition
 
 <p align="center">
   <img src="waveforms/functional_waveform.png" width="900">
 </p>
 
-### Corner Case Waveform
+### Corner Test Cases
+- Reset During Transmission
+- Multiple Consecutive Writes
+- Write While UART is Busy
+- FIFO Overflow Attempt
 
 <p align="center">
   <img src="waveforms/corner_case_waveform.png" width="900">
 </p>
-
----
-
-## Applications
-
-- FPGA communication systems
-- Embedded systems
-- Serial debugging
-- Sensor interfaces
-- Data logging applications
 
 ---
 
@@ -163,10 +207,20 @@ The design was verified in Xilinx Vivado using functional and corner-case testbe
 
 ---
 
-## Skills Learned
+## Applications
 
-- RTL Design
+- FPGA communication
+- Embedded systems
+- Serial interfaces
+- Data logging systems
+- Sensor interfaces
+
+---
+
+## Skills Gained
+
 - Verilog Coding
+- RTL Design
 - UART Protocol
 - FIFO Design
 - Simulation and Verification
@@ -176,6 +230,5 @@ The design was verified in Xilinx Vivado using functional and corner-case testbe
 
 ## Author
 
-**Koustubh Shindhe**
-
-B.E. - VLSI Design and Technology
+**Koustubh Shindhe**  
+B.E. – VLSI Design and Technology
